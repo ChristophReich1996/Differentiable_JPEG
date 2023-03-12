@@ -43,8 +43,8 @@ def compression_strength_to_scale(compression_strength: Tensor) -> Tensor:
     assert isinstance(
         compression_strength, Tensor
     ), f"Given compression strength must be a torch.Tensor, got {type(compression_strength)}."
-    assert (compression_strength.max() <= 100.0) and (
-        compression_strength.min() >= 0.0
+    assert (compression_strength.max() <= 99.0) and (
+        compression_strength.min() >= 1.0
     ), f"Compression strength must range from 0 to 100, got {compression_strength}."
     # Get scale
     scale: Tensor = torch.where(
