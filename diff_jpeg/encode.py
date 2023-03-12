@@ -91,6 +91,20 @@ def jpeg_encode(
         cb_encoded (Tensor): Encoded Cb component of the shape [B, N, 8, 8].
         cr_encoded (Tensor): Encoded Cr component of the shape [B, N, 8, 8].
     """
+    # Check inputs
+    assert isinstance(image_rgb, Tensor), f"Input image (image_rgb) must be a torch.Tensor, got {type(image_rgb)}."
+    assert isinstance(
+        compression_strength, Tensor
+    ), f"Compression strength (compression_strength) must be a torch.Tensor, got {type(compression_strength)}."
+    assert isinstance(differentiable, bool), f"Differentiable flag must be a boolean, got {type(differentiable)}."
+    assert image_rgb.ndim == 4, f"Input image (image_rgb) must be a 4D tensor, got shape {image_rgb.shape}."
+    assert (
+        image_rgb.shape[1] == 3
+    ), f"Input image (image_rgb) must be a batch of RGB image, got shape {image_rgb.shape}."
+    assert image_rgb.shape[0] == compression_strength.shape[0], (
+        f"Batch size of input image and compression strength must match, "
+        f"got image shape {image_rgb.shape[0]} and compression strength shape {compression_strength.shape[0]}"
+    )
     # Convert RGB image to YCbCr ans subsample
     image_ycbcr: Tensor = rgb_to_ycbcr(image_rgb.permute(0, 2, 3, 1)).permute(0, 3, 1, 2)
     input_y, input_cb, input_cr = chroma_subsampling(image_ycbcr)  # type: Tensor, Tensor, Tensor

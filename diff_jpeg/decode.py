@@ -91,6 +91,22 @@ def jpeg_decode(
     Returns:
         rgb_decoded (Tensor): Decompressed RGB image of the shape [B, 3, H, W].
     """
+    assert isinstance(input_y, Tensor), f"Compressed Y component (input_y) must be a torch.Tensor, got {type(input_y)}."
+    assert isinstance(
+        input_cb, Tensor
+    ), f"Compressed Cb component (input_cb) must be a torch.Tensor, got {type(input_cb)}."
+    assert isinstance(
+        input_cr, Tensor
+    ), f"Compressed Cr component (input_cr) must be a torch.Tensor, got {type(input_cr)}."
+    assert isinstance(
+        compression_strength, Tensor
+    ), f"Compression strength (compression_strength) must be a torch.Tensor, got {type(compression_strength)}."
+    assert isinstance(H, int) and (H > 0), f"Height (H) must be as positive integer, got {H}."
+    assert isinstance(W, int) and (W > 0), f"Width (W) must be as positive integer, got {H}."
+    assert input_y.shape[0] == compression_strength.shape[0], (
+        f"Batch size of Y components and compression strength must match, "
+        f"got image shape {input_y.shape[0]} and compression strength shape {compression_strength.shape[0]}"
+    )
     # Dequantize inputs
     input_y = dequantize(input_y, compression_strength, QUANTIZATION_TABLE_Y)
     input_cb = dequantize(input_cb, compression_strength, QUANTIZATION_TABLE_C)
