@@ -11,13 +11,13 @@ M: Tensor = torch.tensor(
         [0.5, -0.418688, -0.081312],
     ],
     dtype=torch.float,
-)
+).T
 
 B = torch.tensor([0, 128, 128], dtype=torch.float)
 
 
 def rgb_to_ycbcr(input_rgb: Tensor) -> Tensor:
-    """
+    """Converts an RGB input to YCbCr.
 
     Args:
         input_rgb (Tensor): RGB input tensor of the shape [*, 3].
@@ -26,15 +26,43 @@ def rgb_to_ycbcr(input_rgb: Tensor) -> Tensor:
         output_ycbcr (Tensor): YCbCr output tensor of the shape [*, 3].
     """
     # Check if input is a tensor with the correct shape
-    assert isinstance(input_rgb, Tensor), f"Given compression strength must be a torch.Tensor, got {type(input_rgb)}."
+    assert isinstance(input_rgb, Tensor), f"Given input must be a torch.Tensor, got {type(input_rgb)}."
     assert input_rgb.shape[-1] == 3, f"Last axis of the input must have 3 dimensions, got {input_rgb.shape[-1]}."
     # Get original shape and dtype
     dtype: torch.dtype = input_rgb.dtype
     device: torch.device = input_rgb.device
     # Convert from RGB to YCbCr
-    output_ycbcr: Tensor = torch.einsum("ij, ...j -> ...i", M.to(dtype=dtype, device=device), input_rgb)
+    output_ycbcr: Tensor = torch.einsum(
+        "...i, ij -> ...j",
+        input_rgb,
+        M.to(dtype=dtype, device=device),
+    )
     output_ycbcr = output_ycbcr + B.to(dtype=dtype, device=device)
     return output_ycbcr
+
+
+def ycbcr_to_rgb(input_ycbcr: Tensor) -> Tensor:
+    """Converts a YCbCr to RGB.
+
+    Args:
+        input_ycbcr (Tensor): YCbCr input of the shape [*, 3]
+
+    Returns:
+        output_rgb (Tensor): RGB output of the shape [*, 3].
+    """
+    # Check if input is a tensor with the correct shape
+    assert isinstance(input_ycbcr, Tensor), f"Given input must be a torch.Tensor, got {type(input_ycbcr)}."
+    assert input_ycbcr.shape[-1] == 3, f"Last axis of the input must have 3 dimensions, got {input_ycbcr.shape[-1]}."
+    # Get original shape and dtype
+    dtype: torch.dtype = input_ycbcr.dtype
+    device: torch.device = input_ycbcr.device
+    # Convert from RGB to YCbCr
+    output_rgb: Tensor = torch.einsum(
+        "...i, ij -> ...j",
+        input_ycbcr - B.to(dtype=dtype, device=device),
+        torch.inverse(M.to(dtype=dtype, device=device)),
+    )
+    return output_rgb
 
 
 def chroma_subsampling(input_ycbcr: Tensor) -> Tuple[Tensor, Tensor, Tensor]:
@@ -56,3 +84,17 @@ def chroma_subsampling(input_ycbcr: Tensor) -> Tuple[Tensor, Tensor, Tensor]:
     output_cb = F.avg_pool2d(output_cb[:, None], (2, 2))[:, 0]
     output_cr = F.avg_pool2d(output_cr[:, None], (2, 2))[:, 0]
     return output_y, output_cb, output_cr
+
+
+def chroma_upsampling(input_c: Tensor) -> Tensor:
+    """Function performs chroma upsampling.
+
+    Args:
+        input_c (Tensor): Cb or Cr component to be upsampled of the shape [B, H, W].
+
+    Returns:
+        output_c (Tensor): Upsampled C(b or r) component of the shape [B, H * 2, W * 2].
+    """
+    # Upsample component
+    output_c: Tensor = F.interpolate(input_c[:, None], scale_factor=2, mode="nearest-exact")[:, 0]
+    return output_c
