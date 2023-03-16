@@ -17,7 +17,7 @@ Shin and Song.
 
 ## Installation
 
-The SmeLU can be installed by using `pip`.
+The differentiable JPEG can be installed by using `pip`.
 
 ````shell script
 pip install git+https://github.com/ChristophReich1996/Differentiable_JPEG
