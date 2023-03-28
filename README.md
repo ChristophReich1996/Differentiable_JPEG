@@ -2,7 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/ChristophReich1996/Differentiable_JPEG/blob/main/LICENSE)
 
-Unofficial PyTorch reimplementation the differentiable JPEG proposed
+Unofficial PyTorch reimplementation of the differentiable JPEG proposed
 in "[JPEG-resistant Adversarial Images](https://machine-learning-and-security.github.io/papers/mlsec17_paper_54.pdf)" by
 Shin and Song.
 
