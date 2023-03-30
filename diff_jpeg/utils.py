@@ -13,7 +13,7 @@ QUANTIZATION_TABLE_Y: Tensor = torch.tensor(
         [72, 92, 95, 98, 112, 100, 103, 99],
     ],
     dtype=torch.float,
-).T
+)
 
 QUANTIZATION_TABLE_C: Tensor = torch.tensor(
     [
@@ -27,7 +27,7 @@ QUANTIZATION_TABLE_C: Tensor = torch.tensor(
         [99, 99, 99, 99, 99, 99, 99, 99],
     ],
     dtype=torch.float,
-).T
+)
 
 
 def compression_strength_to_scale(compression_strength: Tensor) -> Tensor:
