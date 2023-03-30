@@ -45,7 +45,7 @@ def encode_decode() -> None:
     # Load test image and reshape to [B, 3, H, W]
     image: Tensor = torchvision.io.read_image("test_images/00000000.png").float()[None]
     # Init compression
-    compression_strength: Tensor = torch.tensor([5], requires_grad=True, dtype=torch.float)
+    compression_strength: Tensor = torch.tensor([3], requires_grad=True, dtype=torch.float)
     # Perform encoding
     y_encoded, cb_encoded, cr_encoded = jpeg_encode(image, compression_strength, True)
     # Perform decoding
